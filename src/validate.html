@@ -10,6 +10,37 @@
 	</style>
 </head>
 <body>
+<script type="text/javascript">
+var process = function(queue, options) {
+	options = options || {};
+	var data = { stop: false }; // Shared data
+	(function next() {
+		if (data.stop) {
+			$.isFunction(options.stopCallback)
+				? options.stopCallback(data)
+				: options.callback(data);
+			return;
+		}
+		
+		if (queue[0]) {
+			queue.shift().call(queue, data, next);
+		} else {
+			options.callback(data);
+		}
+	})();
+};
+
+var i = 0;
+var queue = [];
+queue.push(function(data, next) { console.log(++i, data); setTimeout(next, 1000); });
+queue.push(function(data, next) { console.log(++i, data); setTimeout(next, 1000); });
+queue.push(function(data, next) { console.log(++i, data); setTimeout(next, 1000); });
+queue.push(function(data, next) { console.log(++i, data); setTimeout(next, 1000); });
+//process(queue, {
+//	stopCallback: function(data) { console.log('stop callback', data); }, // optional
+//	callback: function(data) { console.log('callback', data); }
+//});
+</script>
 <form id="whoo" method="post">
 	<ol>
 		<li>
@@ -53,299 +84,29 @@
 				<option value="2010">2010</option>
 			</select>
 		</li>
+		<li>
+			<select name="birthdate-day" id="fe-letter">
+				<option value="">- Day -</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+			</select>
+			<select name="birthdate-month" id="fe-letter">
+				<option value="">- Month -</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+			</select>
+			<select name="birthdate-year" id="fe-letter">
+				<option value="">- Year -</option>
+				<option value="2008">2008</option>
+				<option value="2009">2009</option>
+				<option value="2010">2010</option>
+			</select>
+		</li>
 	</ol>
 	<input type="submit" />
 </form>
-
-<script type="text/javascript">
-var isValidFirstname = function(errors, next) {
-//	console.log($(this).attr('id')+' isValidFirstname');
-	setTimeout(function() { 
-		next();
-	}, 2000);
-}
-
-var isValidEmail = function(errors, next) {
-//	console.log($(this).attr('id')+' isValidEmail');
-	setTimeout(function() { 
-		next();
-	}, 2000);
-}
-
-var isNoSpamEmail = function(errors, next) {
-//	console.log($(this).attr('id')+' isNoSpamEmail');
-	setTimeout(function() { 
-		next();
-	}, 2000);
-}
-
-var isValidLetter = function(errors, next) {
-//	console.log($(this).attr('id')+' isValidLetter');
-	var v = $(this).val();
-
-	setTimeout(function() { 
-		if (_.indexOf(['B', 'C'], v) == -1) {
-			errors.push({ msg: $(this).attr('name') + ' invalid letter' });
-		}
-		next();
-	}, 2000);
-}
-
-var isValidDate = function(errors, next) {
-	var value = $(this).val();
-
-	setTimeout(function() { 
-		next();
-	}, 2000);
-}
-
-var isNotEmpty = function(errors, next) {
-//	console.log($(this).attr('id')+' isNotEmpty');
-	if ($(this).val().length === 0) {
-		errors.push({ msg: $(this).attr('name') + ' is empty' });
-	}
-	next();
-}
-
-// isRequired: not empty, not null
-var rules = {
-	'firstname': { isRequired: true,                instant: false, validators: [ isValidFirstname ] },
-	'lastname' : { isRequired: true,                instant: false, validators: [ isValidFirstname ] },
-	'email'    : { isRequired: true, isEmail: true, instant: false, validators: [ isNoSpamEmail ] },	
-	'letter'   : { isRequired: true,                instant: true,  validators: [ isValidLetter ] },
-	'date-*'   : { isRequired: true,                instant: true,  validators: [ isValidDate ] },
-}
-
-var process = function(target, queue, options) {
-	options = options || {};
-	var errors = [];
-	(function next() {
-		if (errors.length > 0) {
-			options.callback(false, errors);
-			return;
-		}
-		
-		if (queue[0]) {
-			queue.shift().call(target, errors, next);
-		} else {
-			options.callback(true, errors);
-		}
-	})();
-};
-
-
-(function($) {
-	$.fn.validate = function(rules, options) {
-		var o = $.extend({
-			callback: function(success, errors) { console.log([success, errors]); }
-		}, options || {});
-
-		return $(this).each(function() {
-			var $$ = $(this);
-
-//			console.log('Attaching to "'+$$.attr('id')+'"');
-
-			var formQueue = {};
-			
-			_.each(_.keys(rules), function(name) {
-//				console.log('Processing rule for "'+name+'"');
-			
-				// Pick up form element
-				var $target = $('*[name="'+name+'"]', $$);
-				
-				if ($target.length === 0) {
-					throw 'Form-field "'+ name +'" was not found!';
-				}
-			
-				var rule = rules[name];
-			
-				var isInstant  = 'instant' in rule && rule['instant'] === true;
-				var isRequired = 'isRequired' in rule  && rule['isRequired'] === true;
-				var isEmail    = 'isEmail' in rule  && rule['isEmail'] === true;
-			
-				if (isInstant) {
-//					console.log('Field '+ name +' is instanct');
-			
-					var itemQueue = _.clone(rule['validators']);
-			
-					isRequired && itemQueue.unshift(isNotEmpty);
-					isEmail && itemQueue.unshift(isValidEmail);
-			
-					$target.blur(function(e) {
-						console.log('blur');
-						process(e.currentTarget, itemQueue, { callback: o.callback });
-					});
-				}
-				else {
-					var itemQueue = formQueue[name] = [];
-
-					_.extend(itemQueue, rule['validators']);
-
-					isRequired && itemQueue.unshift(isNotEmpty);
-					isEmail && itemQueue.unshift(isValidEmail);
-				}
-			});
-
-			$$.submit(function(e) {
-				e.preventDefault();
-
-				// @todo Workaround for only triggering the callback once, otherwise it got triggered for each form field.
-				var once = _.once(o.callback);
-
-				$.each(formQueue, function(name, itemQueue) {
-					$('*[name="'+name+'"]', $$).each(function(i, el) {
-						process(el, itemQueue, { callback: once });
-					});
-				});
-			});
-		});
-	};
-})(jQuery);
-
-$('form').validate(rules, {
-	callback: function(success, errors) { console.log([success, errors]); }
-});
-
-/*
-var formQueue = [];
-
-_.each(_.keys(rules), function(name) {
-	console.log('Processing rule for "'+name+'"');
-
-	// Pick up form element
-	var $target = $('input[name="'+name+'"]');
-	
-	if ($target.length === 0) {
-		throw 'Form-field "'+ name +'" was not found!';
-	}
-
-	var rule = rules[name];
-
-	var isInstant  = 'instant' in rule && rule['instant'] === true;
-	var isRequired = 'isRequired' in rule  && rule['isRequired'] === true;
-	var isEmail    = 'isEmail' in rule  && rule['isEmail'] === true;
-
-	if (isInstant) {
-		console.log(name + ' is instanct');
-
-		var errors = [];
-		var itemQueue = _.clone(rule['validators']);
-
-		isRequired && itemQueue.unshift(isNotEmpty);
-		isEmail && itemQueue.unshift(isValidEmail);
-
-		$target.blur(function(e) {
-			console.log('blur');
-			process(e.currentTarget, itemQueue, function(success, errors) { 
-				console.log([success, errors]); 
-			});
-			console.log('end');
-		});
-	}
-	else {
-		isRequired && formQueue.unshift(isNotEmpty);
-		isEmail && formQueue.unshift(isValidEmail);
-		
-		_.extend(formQueue, rule['validators']);
-	}
-});
-*/
-
-
-/*
-var queue = [];
-queue.push(function(errors, next) {
-	console.log('A');
-	var t = this;
-	setTimeout(function() { console.log('AA'); next(); }, 2000);
-});
-queue.push(function(errors, next) {
-	console.log('B');
-	var t = this;
-	errors.push('FUCK');
-	setTimeout(function() { console.log('BB'); next(); }, 2000);
-});
-queue.push(function(errors, next) {
-	console.log('C');
-	var t = this;
-	setTimeout(function() { console.log('CC'); next(); }, 2000);
-});
-
-var process = function(target, queue, callback) {
-	var errors = [];
-	(function next() {
-		if (errors.length > 0) {
-			callback(false, errors);
-			return;
-		}
-		
-		if (queue[0]) {
-			queue.shift().call(target, errors, next);
-		} else {
-			callback(true, errors);
-		}
-	})();
-};
-
-var target = $('input[name="email"]').get(0);
-process(target, queue, function(success, errors) { console.log(errors); });
-*/
-
-
-
-
-
-
-/*
-function Queue() {
-	var callbacks_ = [];
-	
-	this.add = function(fn) {
-		callbacks_.push(fn);
-	};
-	
-	this.next = function(errors) {
-		if (callbacks_[0]) {
-			callbacks_.shift().apply(this, errors);
-		}
-	};
-	
-	this.process = function() {
-		var e = [];
-		this.next(e);
-	};
-}
-
-var queue = new Queue();
-queue.add(function() {
-	var queue = this;
-	var errors = ['A error'];
-	console.log('A');
-	setTimeout(function() {
-		console.log('AA');
-		queue.next(errors);
-	}, 2000);
-});
-queue.add(function() {
-	var queue = this;
-	var errors = ['B error'];
-	console.log('B');
-	setTimeout(function() {
-		console.log('BB');
-		queue.next(errors);
-	}, 2000);
-});
-queue.add(function() {
-	var queue = this;
-	var errors = ['C error'];
-	console.log('C');
-	setTimeout(function() {
-		console.log('CC');
-		queue.next(errors);
-	}, 2000);
-});
-queue.process();
-*/
-</script>
+<script type="text/javascript" src="validate.js"></script>
 </body>
 </html>
