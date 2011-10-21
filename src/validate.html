@@ -10,39 +10,12 @@
 	</style>
 </head>
 <body>
-<script type="text/javascript">
-var process = function(queue, options) {
-	options = options || {};
-	var data = { stop: false }; // Shared data
-	(function next() {
-		if (data.stop) {
-			$.isFunction(options.stopCallback)
-				? options.stopCallback(data)
-				: options.callback(data);
-			return;
-		}
-		
-		if (queue[0]) {
-			queue.shift().call(queue, data, next);
-		} else {
-			options.callback(data);
-		}
-	})();
-};
-
-var i = 0;
-var queue = [];
-queue.push(function(data, next) { console.log(++i, data); setTimeout(next, 1000); });
-queue.push(function(data, next) { console.log(++i, data); setTimeout(next, 1000); });
-queue.push(function(data, next) { console.log(++i, data); setTimeout(next, 1000); });
-queue.push(function(data, next) { console.log(++i, data); setTimeout(next, 1000); });
-//process(queue, {
-//	stopCallback: function(data) { console.log('stop callback', data); }, // optional
-//	callback: function(data) { console.log('callback', data); }
-//});
-</script>
 <form id="whoo" method="post">
 	<ol>
+		<li>
+            <input type="radio" id="title_m" name="gender" value="m"><label for="title_m" id="ltitle_m">Herr</label>
+            <input type="radio" id="title_w" name="gender" value="w" ><label for="title_w" id="ltitle_w">Frau</label>
+		</li>
 		<li>
 			<label for="fe-firstname">Firstname</label>
 			<input type="text" name="firstname" id="fe-firstname" />
@@ -107,6 +80,6 @@ queue.push(function(data, next) { console.log(++i, data); setTimeout(next, 1000)
 	</ol>
 	<input type="submit" />
 </form>
-<script type="text/javascript" src="validate.js"></script>
+<script type="text/javascript" src="validate-ng.js"></script>
 </body>
 </html>
