@@ -10,19 +10,20 @@ Quickstart
 
 Use it naked::
 
-	var options = {
+	var bouncer = FormBouncer.create('#whoo', {
 		stopOnError: false,
-		callback: function(errors) { $.each(errors, function(k,v) { console.log(v.msg); }); }
-	};
+		callback: function(errors) { 
+			$.each(errors, function(k,v) { console.log(v.msg); });
+		}
+	});
 
-	var validator = FormValidator.create('#whoo', options);
-	validator.addRule('firstname', /^[\w]{3,}$/)
-	         .addRule('lastname', [/^[\w]{5,}$/, 'noop'])
-	         .addRule('email', ['noop', 'isEmail'], { instant: true, instantOnly: true })
-	         .addRule('gender', isGender)
-	         .addRule('letter', /[AB]/)
-	         .addRule('*[name^="date-"]', isValidDate, { instant: true })
-	         .addRule($('*[name^="birthdate-"]'), isValidDate);
+	bouncer.addRule('firstname', /^[\w]{3,}$/)
+	       .addRule('lastname', [/^[\w]{5,}$/, 'noop'])
+	       .addRule('email', ['noop', 'isEmail'], { instant: true, instantOnly: true })
+	       .addRule('gender', isGender)
+	       .addRule('letter', /[AB]/)
+	       .addRule('*[name^="date-"]', isValidDate, { instant: true })
+	       .addRule($('*[name^="birthdate-"]'), isValidDate);
 	       
 Use it through jQuery::
 
@@ -72,11 +73,11 @@ Register validators
 
 It is useful to register often used validators at the Validator::
 
-	Validator.registerValidator('noop', function(errors, proceed) { 
+	FormBouncer.registerValidator('noop', function(errors, proceed) { 
 		proceed(); 
 	});
 
 Afterwards you are able to make use of it as simple as that::
 
-	validator.addRule('firstname', 'noop');
+	bouncer.addRule('firstname', 'noop');
 

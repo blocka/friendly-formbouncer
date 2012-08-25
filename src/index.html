@@ -133,7 +133,7 @@
 	}
 
 	$(function() {
-		var validator = FormBouncer.create('#whoo', {
+		var bouncer = FormBouncer.create('#whoo', {
 			stopOnError: false,
 			cleanup: function() {
 				console.log($('.feedback', this));
@@ -154,14 +154,14 @@
 				});
 			}
 		});
-		validator.addRule('firstname', FormBouncer.patternValidator(/^[\w]{3,}$/, 'The firstname must be at least 3 chars long'))
-		         .addRule('lastname', [/^[\w]{5,}$/, 'noop'])
-		         .addRule('email', ['noop', 'isEmail'], { instant: true, instantOnly: true })
-		         .addRule('gender', isGender)
-		         .addRule('letter', /[AB]/)
-		         .addRule('area', [/^[\w]{5,}$/, 'noop'])
-		         .addRule('*[name^="date-"]', isValidDate, { instant: true })
-		         .addRule($('*[name^="birthdate-"]'), isValidDate, { instant: true });
+		bouncer.addRule('firstname', FormBouncer.patternValidator(/^[\w]{3,}$/, 'The firstname must be at least 3 chars long'))
+		       .addRule('lastname', [/^[\w]{5,}$/, 'noop'])
+		       .addRule('email', ['noop', 'isEmail'], { instant: true, instantOnly: true })
+		       .addRule('gender', isGender)
+		       .addRule('letter', /[AB]/)
+		       .addRule('area', [/^[\w]{5,}$/, 'noop'])
+		       .addRule('*[name^="date-"]', isValidDate, { instant: true })
+		       .addRule($('*[name^="birthdate-"]'), isValidDate, { instant: true });
 	});
 </script>
 </body>
