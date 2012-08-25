@@ -1,0 +1,168 @@
+<html>
+<head>
+	<style>
+		body { 
+			font-family: "Helvetica Neue", Helvetica, sans-serif;
+			font-size: 14px;
+			padding: 2em;
+		}
+		ol {
+			list-style-type: none;
+			list-style-position: inside;
+			margin: 0;
+			padding: 0;
+		}
+		label { display: block; }
+		li { margin-top: 0.5em; }
+		li.error label {
+			color: red;
+		}
+		input, select, textarea {
+			border: 1px solid #CCC;
+			background-color: #EFEFEF;
+			padding: 8px;
+			font-family: "Helvetica Neue", Helvetica, sans-serif;
+			font-size: 14px;
+		}
+	</style>
+</head>
+<body>
+<h1>ButFriendly's FormBouncer</h1>
+<form id="whoo" method="post">
+	<ol>
+		<li>
+			<input type="radio" id="title_m" name="gender" value="m"><label for="title_m" id="ltitle_m">Herr</label>
+			<input type="radio" id="title_w" name="gender" value="w" ><label for="title_w" id="ltitle_w">Frau</label>
+		</li>
+		<li>
+			<label for="fe-firstname">Firstname</label>
+			<input type="text" name="firstname" id="fe-firstname" />
+		</li>
+		<li>
+			<label for="fe-lastname">Lastname</label>
+			<input type="text" name="lastname" id="fe-lastname" />
+		</li>
+		<li>
+			<label for="fe-email">Email</label>
+			<input type="text" name="email" id="fe-email" />
+		</li>
+		<li>
+			<label for="fe-letter">Letter</label>
+			<select name="letter" id="fe-letter">
+				<option value="">- Choose -</option>
+				<option value="A">A</option>
+				<option value="B">B</option>
+				<option value="C">C</option>
+			</select>
+		</li>
+		<li>
+			<label for="fe-area">Textarea</label>
+			<textarea name="area" id="fe-area" cols="60" rows="4"></textarea>
+		</li>
+		<li>
+			<label for="fe-date">Date</label>
+			<select name="date-day" id="fe-letter">
+				<option value="">- Day -</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+			</select>
+			<select name="date-month" id="fe-letter">
+				<option value="">- Month -</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+			</select>
+			<select name="date-year" id="fe-letter">
+				<option value="">- Year -</option>
+				<option value="2008">2008</option>
+				<option value="2009">2009</option>
+				<option value="2010">2010</option>
+			</select>
+		</li>
+		<li>
+			<label for="fe-birthdate">Birthdate</label>
+			<select name="birthdate-day" id="fe-letter">
+				<option value="">- Day -</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+			</select>
+			<select name="birthdate-month" id="fe-letter">
+				<option value="">- Month -</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+			</select>
+			<select name="birthdate-year" id="fe-letter">
+				<option value="">- Year -</option>
+				<option value="2008">2008</option>
+				<option value="2009">2009</option>
+				<option value="2010">2010</option>
+			</select>
+		</li>
+	</ol>
+	<input type="submit" />
+</form>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.6/underscore-min.js"></script>
+<script type="text/javascript" src="formbouncer.js"></script>
+<script type="text/javascript">
+	var isGender = function(errors, next) {
+		var $el = this.filter(':checked');
+		if (0 === $el.length) {			
+			errors.push(FormBouncer.error($el, 'No gender chosen'));
+		}
+		else if (_.indexOf(['m', 'w'], $el.val()) === -1) {
+			errors.push(FormBouncer.error($el, 'Invalid gender'));
+		}
+		next();
+	}
+
+	/* Stupid example for a date validator which is in NO WAY useful. */
+	var isValidDate = function(errors, next) {
+		var d = this.filter('*[name$="-day"]').val();
+		var m = this.filter('*[name$="-month"]').val();
+		var y = this.filter('*[name$="-year"]').val();
+
+		if (!$.isNumeric(d) || !$.isNumeric(m) || !$.isNumeric(y)) {
+			errors.push(FormBouncer.error(this, 'Invalid date'));
+		}
+
+		next();
+	}
+
+	$(function() {
+		var validator = FormBouncer.create('#whoo', {
+			stopOnError: false,
+			cleanup: function() {
+				console.log($('.feedback', this));
+				$('.error', this).removeClass('error');
+				$('.feedback', this).hide();
+			},
+			callback: function(errors) { 
+				$.each(errors, function(i, e) {
+					console.log(e.message); 
+					var p = e.target.parent()
+					var fb = e.target.siblings().filter('.feedback');
+					if (fb.length === 0) {
+						fb = $('<span class="feedback"></span>');
+						p.prepend(fb);
+					}
+					fb.html(e.message).show();
+					p.addClass('error');
+				});
+			}
+		});
+		validator.addRule('firstname', FormBouncer.patternValidator(/^[\w]{3,}$/, 'The firstname must be at least 3 chars long'))
+		         .addRule('lastname', [/^[\w]{5,}$/, 'noop'])
+		         .addRule('email', ['noop', 'isEmail'], { instant: true, instantOnly: true })
+		         .addRule('gender', isGender)
+		         .addRule('letter', /[AB]/)
+		         .addRule('area', [/^[\w]{5,}$/, 'noop'])
+		         .addRule('*[name^="date-"]', isValidDate, { instant: true })
+		         .addRule($('*[name^="birthdate-"]'), isValidDate, { instant: true });
+	});
+</script>
+</body>
+</html>
