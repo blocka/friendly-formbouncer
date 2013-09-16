@@ -1,0 +1,38 @@
+{
+  "name": "friendly-formbouncer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Gruntfile.js",
+  "directories": {
+    "example": "examples"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-cli": "~0.1.9",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-jshint": "~0.6.4",
+    "matchdep": "~0.1.2",
+    "grunt-bower-task": "~0.3.2",
+    "grunt-contrib-connect": "~0.5.0",
+    "connect-livereload": "~0.3.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/butfriendly/friendly-formbouncer.git"
+  },
+  "keywords": [
+    "Form",
+    "Validator"
+  ],
+  "author": "Christian Schmitz <chris@butfriendly.com>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/butfriendly/friendly-formbouncer/issues"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "friendly-formbouncer",
+  "version": "1.0.0",
+  "authors": [
+    "Christian Schmitz <chris@butfriendly.com>"
+  ],
+  "description": "ButFriendly's Formbouncer is an asynchronous and rule based form validator",
+  "keywords": [
+    "Form",
+    "Validation",
+    "Validator"
+  ],
+  "license": "BSD-2-Clause",
+  "homepage": "https://github.com/butfriendly/friendly-formbouncer",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.0.0",
+    "jquery": "~2.0.3",
+    "underscore": "~1.5.2"
+  }
+}
