@@ -9,7 +9,13 @@ module.exports = function(grunt) {
 
 		// Install dependencies
 		bower: {
-			install: {}
+			install: {
+				options: {
+					targetDir: './examples/lib',
+					cleanTargetDir: true,
+					cleanBowerDir: true
+				}
+			}
 		},
 
 		// Remove build and dist directory
@@ -38,7 +44,8 @@ module.exports = function(grunt) {
 		uglify: {
 			dist: {
 				files: {
-					'dist/formbouncer.min.js': ['src/formbouncer.js']
+					'dist/formbouncer.min.js': ['src/formbouncer.js'],
+					'dist/jquery.formbouncer.min.js': ['src/jquery.formbouncer.js']
 				}
 			}
 		},
