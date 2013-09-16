@@ -5,13 +5,13 @@ var FormBouncer = (function() {
 
 		this.toString = function() {
 			return message;
-		}
-	}
+		};
+	};
 
 	var Rule = function($target, validator, options) {
 		this.target = $target;
 		this.validator = validator;
-	}
+	};
 
 	// Default options
 	var defaults = {
@@ -35,15 +35,18 @@ var FormBouncer = (function() {
 		 * - callback
 		 */
 		var processQueue = function(queue) {
-			var $form = this;
+			// var $form = this;
 			var errors = [];
 			var i = 0;
 			var l =  queue.length;
 			(function next() {
 				if (o.stopOnError && errors.length > 0) {
-					$.isFunction(o.errorCallback)
-						? o.errorCallback(errors)
-						: o.callback(errors);
+					if ($.isFunction(o.errorCallback)) {
+						o.errorCallback(errors);
+					}
+					else {
+						o.callback(errors);
+					}
 					return;
 				}
 
@@ -89,7 +92,7 @@ var FormBouncer = (function() {
 			}
 
 			return target;
-		}
+		};
 
 		/**
 		 * Resolves form.
@@ -102,13 +105,13 @@ var FormBouncer = (function() {
 					throw 'FormNotFound';
 				}
 			}
-			else if('object' === type) {
+			else if ('object' === type) {
 			}
 			else {
 				throw 'InvalidForm';
 			}
 			return form;
-		}
+		};
 
 
 		/**
@@ -148,15 +151,15 @@ var FormBouncer = (function() {
 			}
 
 			return validators;
-		}
+		};
 
 		/* Adds a fresh rule to the validator 
-		   target - 
-		   validator - 
-		   options - 
-		        - instant - Validates the target instantly
-		        - instantOnly - Validates the target inly instant
-		   */
+		 * target - 
+		 * validator - 
+		 * options - 
+		 *      - instant - Validates the target instantly
+		 *      - instantOnly - Validates the target inly instant
+		 **/
 		this.addRule = function(target, validator, options) {
 			options = options || {};
 
@@ -188,7 +191,7 @@ var FormBouncer = (function() {
 			}
 
 			return this;
-		}
+		};
 
 		this.validate = function() {
 			// Should we clean up?
@@ -196,7 +199,7 @@ var FormBouncer = (function() {
 				o.cleanup.call($form_);
 			}
 			processQueue.call($form_, queue_);
-		}
+		};
 
 		$form_ = resolveForm(form);
 
@@ -204,7 +207,7 @@ var FormBouncer = (function() {
 			e.preventDefault();
 			this.validate();
 		}, this));
-	}
+	};
 
 	/* Predefined and re-usable validators */
 	Validator.validators = {};
@@ -213,15 +216,15 @@ var FormBouncer = (function() {
 		options = options || {};
 		var validator = new Validator(form, options);
 		return validator;
-	}
+	};
 
 	Validator.registerValidator = function(id, fn) {
 		Validator.validators[id] = fn;
-	}
+	};
 
 	Validator.error = function(target, message) {
 		return new ValidationError(target, message);
-	}
+	};
 
 	Validator.patternValidator = function(pattern, message) {
 		return function(errors, proceed) {
@@ -229,8 +232,8 @@ var FormBouncer = (function() {
 				errors.push(Validator.error(this, message));
 			}
 			proceed();
-		}
-	}
+		};
+	};
 
 	Validator.registerValidator('isEmail', function(errors, proceed) {
 		var pattern = /^([\w\.\-\+\=]+)@((?:[a-z0-9\-_]+\.)+[a-z]{2,6})$/i;
@@ -268,6 +271,6 @@ var FormBouncer = (function() {
 			$(rules).each(function() {
 				validator.addRule.apply($$, this);
 			});
-		})
-	}
+		});
+	};
 })(jQuery);
