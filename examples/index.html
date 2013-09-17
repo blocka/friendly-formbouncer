@@ -257,6 +257,16 @@
 		next();
 	}
 
+	var remoteValidator = function(errors, next) {
+		var self = this;
+		$.getJSON('remote.json', function(data) {
+			if (this.val().length > 3) {
+				errors.push(FormBouncer.error(self, 'Invalid password'));
+			}
+			next();
+		});
+	}
+
 	$(function() {
 		// Attach the bouncer to form with id #whoo
 		var bouncer = FormBouncer.create('#whoo', {
@@ -314,6 +324,8 @@
 		});
 
 		bouncer.addRule('gender', isGender);
+
+		bouncer.addRule('password', remoteValidator, { instant: true });
 
 		bouncer.addRule('letter', /[AB]/);
 
