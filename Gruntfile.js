@@ -45,7 +45,7 @@ module.exports = function(grunt) {
 			dist: {
 				files: {
 					'dist/formbouncer.min.js': ['src/formbouncer.js'],
-					'dist/jquery.formbouncer.min.js': ['src/jquery.formbouncer.js']
+					'dist/jquery.formbouncer.min.js': ['src/formbouncer.js', 'src/jquery.formbouncer.js']
 				}
 			}
 		},
