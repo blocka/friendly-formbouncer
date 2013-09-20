@@ -4,7 +4,7 @@
   "authors": [
     "Christian Schmitz <chris@butfriendly.com>"
   ],
-  "description": "ButFriendly's Formbouncer is an asynchronous and rule based form validator",
+  "description": "ButFriendly's Formbouncer is a nifty, lightweight, rule based form validator, which also supports asynchronous and remote validation of form-fields. ",
   "keywords": [
     "Form",
     "Validation",
