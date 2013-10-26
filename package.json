@@ -33,7 +33,7 @@
   },
   "scripts": {
     "start": "./node_modules/.bin/grunt dist && ./node_modules/.bin/grunt dev",
-    "install": "./node_modules/.bin/grunt bower",
+    "install": "bower install",
     "test": "./node_modules/.bin/grunt test"
   },
   "repository": {
