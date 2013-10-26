@@ -11,10 +11,23 @@ module.exports = function(grunt) {
 		bower: {
 			install: {
 				options: {
-					targetDir: './examples/lib',
 					cleanTargetDir: true,
 					cleanBowerDir: true
 				}
+			}
+		},
+
+		karma: {
+			options: {
+				configFile: 'karma.conf.js'
+			},
+			continuous: {
+				singleRun: true,
+				browsers: ['PhantomJS']
+			},
+			dev: {
+				reporters: 'dots',
+				background: true
 			}
 		},
 
@@ -25,6 +38,10 @@ module.exports = function(grunt) {
 			scripts: {
 				files: [ 'src/**/*.js', 'examples/*.html' ],
 				tasks: ['uglify']
+			},
+			tests: {
+				files: [ 'tests/**/*.js', 'tests/*.html' ],
+				tasks: ['karma']
 			},
 			options: {
 				spawn: false
@@ -62,9 +79,6 @@ module.exports = function(grunt) {
 						return [
 							require('connect-livereload')(),
 
-							// Redirect all non-root requests to index.html
-							rewriteMiddleware(options.base, '/examples/index.html'), 
-
 							// Serve statics
 							connect.static(options.base),
 
@@ -75,51 +89,14 @@ module.exports = function(grunt) {
 				}
 			}
 		}
-
 	});
 
-	var rewriteMiddleware = (function() {
-		var fs = require('fs'),
-			url = require('url');
-
-		return function (rootDir, indexFile) {
-			indexFile = indexFile || "index.html";
-
-			return function(req, res, next){
-				var path = url.parse(req.url).pathname;
-				/*jshint unused:false */
-				fs.readFile(rootDir + path, function(err, buf) {
-					if (!err) {
-						// Continue when the path exists
-						return next();
-					}
-
-					// Deliver indexFile
-					fs.readFile(rootDir + '/' + indexFile, function (error, buffer) {
-						if (error) {
-							return next(error);
-						}
-
-						var resp = {
-							headers: {
-								'Content-Type': 'text/html',
-								'Content-Length': buffer.length
-							},
-							body: buffer
-						};
-						res.writeHead(200, resp.headers);
-						res.end(resp.body);
-					});
-				});
-				/*jshint unused:false */
-			};
-		};
-	})();
-
-	grunt.registerTask('test', 'nodeunit');
+	grunt.registerTask('test', ['karma']);
 
 	grunt.registerTask('dist', ['jshint', 'clean', 'uglify']);
 
-	grunt.registerTask('default', ['dist', 'connect', 'watch']);
+	grunt.registerTask('dev', ['test', 'dist', 'connect:dev', 'watch']);
+
+	grunt.registerTask('default', ['dev']);
 
 };

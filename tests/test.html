@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Formbouncer tests</title>
+	<link rel="stylesheet" media="all" href="../examples/lib/mocha/mocha.css">
+</head>
+<body>
+	<div id="mocha"><p><a href="test.html">Index</a></p></div>
+	<div id="messages"></div>
+	<div id="fixtures"></div>
+
+	<script type="text/javascript" src="../examples/lib/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../examples/lib/underscore/underscore.js"></script>
+	<script type="text/javascript" src="../examples/lib/mocha/mocha.js"></script>
+	<script type="text/javascript" src="../examples/lib/chai/chai.js"></script>
+	<script type="text/javascript" src="../src/formbouncer.js"></script>
+	<script>mocha.setup('bdd')</script>
+	<script type="text/javascript" src="test.formbouncer.js"></script>
+	<script>mocha.run();</script>
+</body>
+</html>
