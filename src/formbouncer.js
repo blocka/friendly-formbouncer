@@ -1,4 +1,16 @@
-var FormBouncer = (function() {
+(function(name, context, definition) {
+	if (typeof module !== 'undefined' && module.exports) {
+		module.exports = definition();
+	}
+	else if (typeof define === 'function' && define.amd) {
+		define(definition);
+	}
+	else {
+		context[name] = definition();
+	}
+}('FormBouncer', this, function() {
+	'use strict';
+
 	var ValidationError = function(target, message) {
 		this.target = target;
 		this.message = message;
@@ -79,7 +91,7 @@ var FormBouncer = (function() {
 
 			if(target instanceof jQuery) {
 				if (target.length === 0) {
-					throw 'EmptyJqueryTarget '+selector;
+					throw new Error('EmptyJqueryTarget: '+selector);
 				}
 				else if (target.length === 1) {
 					// single item
@@ -89,7 +101,7 @@ var FormBouncer = (function() {
 				}
 			}
 			else {
-				throw 'InvalidTarget';
+				throw new Error('InvalidTarget');
 			}
 
 			return target;
@@ -99,19 +111,21 @@ var FormBouncer = (function() {
 		 * Resolves form.
 		 */
 		var resolveForm = function(form) {
-			var type = $.type(form);
-			if ('string' === type) { // selector
-				form = $(form);
-				if (0 === form.length) {
-					throw 'FormNotFound';
+			if ('string' === $.type(form)) {
+				form = document.getElementById(form);
+				if (null === form) {
+					throw new Error('FormNotFoundById: '+form);
 				}
 			}
-			else if ('object' === type) {
+			else if(form instanceof jQuery) {
+				form = form.filter('form').get(0);
 			}
-			else {
-				throw 'InvalidForm';
+
+			if ((form instanceof Element) && 'form' === form.tagName.toLowerCase()) {
+				return $(form);
 			}
-			return form;
+
+			throw new Error('InvalidForm');
 		};
 
 
@@ -133,7 +147,7 @@ var FormBouncer = (function() {
 			}
 			else if ('string' === type) { // Use of predefined validator
 				if (!(validator in Validator.validators)) {
-					throw 'InvalidPredefinedValidator';
+					throw new Error('InvalidPredefinedValidator');
 				}
 				validators.push(Validator.validators[validator]);
 			}
@@ -148,7 +162,7 @@ var FormBouncer = (function() {
 				});
 			}
 			else {
-				throw 'InvalidValidator';
+				throw new Error('InvalidValidator');
 			}
 
 			return validators;
@@ -228,6 +242,9 @@ var FormBouncer = (function() {
 	};
 
 	Validator.patternValidator = function(pattern, message) {
+		if (!(pattern instanceof RegExp)) {
+			throw new Error('InvalidPattern');
+		}
 		return function(errors, proceed) {
 			if (!pattern.test(this.val())) {
 				errors.push(Validator.error(this, message));
@@ -236,14 +253,14 @@ var FormBouncer = (function() {
 		};
 	};
 
-	Validator.registerValidator('isEmail', function(errors, proceed) {
+	// Register pre-defined isEmail-validator
+	(function() {
 		var pattern = /^([\w\.\-\+\=]+)@((?:[a-z0-9\-_]+\.)+[a-z]{2,6})$/i;
-		if (!pattern.test(this.val())) {
-			errors.push(Validator.error(this, 'invalid email.'));
-		}
-		proceed();
-	});
+		var isEmailValidator = Validator.patternValidator(pattern, 'Invalid email.');
+		Validator.registerValidator('isEmail', isEmailValidator);
+	})();
 
+	// Register pre-defined isNotEmpty-validator
 	Validator.registerValidator('isNotEmpty', function(errors, proceed) {
 		this.each(function() {
 			var $$ = $(this);
@@ -254,24 +271,10 @@ var FormBouncer = (function() {
 		proceed();
 	});
 
+	// Register pre-defined noop-validator
 	Validator.registerValidator('noop', function(errors, proceed) {
 		proceed();
 	});
 
 	return Validator;
-})();
-
-(function() {
-	$.fn.validate = function(rules, options) {
-		options = options || {};
-
-		return $(this).each(function() {
-			var $$ = $(this);
-
-			var validator = FormBouncer.create($$, options);
-			$(rules).each(function() {
-				validator.addRule.apply($$, this);
-			});
-		});
-	};
-})(jQuery);
+}));

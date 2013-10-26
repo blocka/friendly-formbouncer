@@ -82,7 +82,7 @@
 <body>
 <div class="container">
 	<div class="jumbotron">
-		<h1>ButFriendly's FormBouncer</h1>
+		<h1>ButFriendly's Formbouncer</h1>
 		<p>ButFriendly's Formbouncer is a nifty, lightweight, rule based form validator, which also supports asynchronous and remote validation of form-fields.</p>
 	</div>
 
@@ -258,10 +258,10 @@
 	}
 
 	var remoteValidator = function(errors, next) {
-		var self = this;
+		var that = this;
 		$.getJSON('remote.json', function(data) {
-			if (this.val().length > 3) {
-				errors.push(FormBouncer.error(self, 'Invalid password'));
+			if ($(that).val().length > 3) {
+				errors.push(FormBouncer.error(that, 'Invalid password'));
 			}
 			next();
 		});
