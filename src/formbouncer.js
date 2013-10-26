@@ -11,6 +11,7 @@ var FormBouncer = (function() {
 	var Rule = function($target, validator, options) {
 		this.target = $target;
 		this.validator = validator;
+		this.options = options;
 	};
 
 	// Default options
@@ -185,7 +186,7 @@ var FormBouncer = (function() {
 
 			if (instantQueue.length > 0) {
 				// For groups we bind to the last item
-				($targets.length > 1 ? $targets.last() : $targets).bind('blur', function(e) {
+				($targets.length > 1 ? $targets.last() : $targets).bind('blur', function() {
 					processQueue.call($form_, instantQueue, o);
 				});
 			}

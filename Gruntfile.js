@@ -87,7 +87,7 @@ module.exports = function(grunt) {
 
 			return function(req, res, next){
 				var path = url.parse(req.url).pathname;
-				/*jshint unused:true */
+				/*jshint unused:false */
 				fs.readFile(rootDir + path, function(err, buf) {
 					if (!err) {
 						// Continue when the path exists
