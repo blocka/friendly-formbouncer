@@ -34,7 +34,7 @@ module.exports = function(config) {
     reporters: ['dots', 'junit'],
     junitReporter: {
         outputFile: 'test-results.xml'
-    }
+    },
 
 
     // web server port
