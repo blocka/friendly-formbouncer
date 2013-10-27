@@ -76,22 +76,26 @@
 		 * Resolves the target of a rule.
 		 */
 		var resolveTarget = function(target) {
-			var type = $.type(target), selector = '';
+			var type = $.type(target)
+			  , selector = '';
 
 			if (type === 'string') { // selector or name
-				if (/^[\w\d]+$/.test(target)) { // It's a name (only letters and numerics)
-					target = selector = '[name="'+target+'"]';
+				if (/^[\w\d\-_]+$/.test(target)) { // It's a name (only letters and numerics)
+					selector = '[name="'+target+'"]';
 				}
 				else { // It's a selector (fancy other stuff than letters)
 					selector = target;
 				}
+				target = $(selector, $form_);
+			}
+			else {
+				target = $(target);
 			}
 
-			target = $(target, $form_);
 
 			if(target instanceof jQuery) {
 				if (target.length === 0) {
-					throw new Error('EmptyJqueryTarget: '+selector);
+					throw new Error('TargetNotFound: '+selector);
 				}
 				else if (target.length === 1) {
 					// single item
@@ -112,12 +116,10 @@
 		 */
 		var resolveForm = function(form) {
 			if ('string' === $.type(form)) {
-				form = document.getElementById(form);
-				if (null === form) {
-					throw new Error('FormNotFoundById: '+form);
-				}
+				form = $(form);
 			}
-			else if(form instanceof jQuery) {
+
+			if(form instanceof jQuery) {
 				form = form.filter('form').get(0);
 			}
 
@@ -147,7 +149,7 @@
 			}
 			else if ('string' === type) { // Use of predefined validator
 				if (!(validator in Validator.validators)) {
-					throw new Error('InvalidPredefinedValidator');
+					throw new Error('ValidatorNotFound');
 				}
 				validators.push(Validator.validators[validator]);
 			}

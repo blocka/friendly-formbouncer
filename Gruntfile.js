@@ -39,7 +39,7 @@ module.exports = function(grunt) {
 			},
 			tests: {
 				files: [ 'tests/**/*.js', 'tests/*.html' ],
-				tasks: ['karma']
+				tasks: ['karma:dev:run']
 			},
 			options: {
 				spawn: false
@@ -90,11 +90,11 @@ module.exports = function(grunt) {
 		}
 	});
 
-	grunt.registerTask('test', ['karma']);
+	grunt.registerTask('test', ['karma:continuous']);
 
 	grunt.registerTask('dist', ['jshint', 'clean', 'uglify']);
 
-	grunt.registerTask('dev', ['test', 'dist', 'connect:dev', 'watch']);
+	grunt.registerTask('dev', ['karma:dev', 'dist', 'connect:dev', 'watch']);
 
 	grunt.registerTask('default', ['dev']);
 

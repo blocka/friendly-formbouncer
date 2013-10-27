@@ -3,53 +3,96 @@ var expect = chai.expect;
 
 describe("FormBouncer", function() {
 	var formElm = document.createElement('form');
-	var validator = FormBouncer.create(formElm, {});
+	var formbouncer = FormBouncer.create(formElm, {});
+
+	describe("addRule", function() {
+
+		it("should fail on not existing name-target", function() {
+			var fn = function() {
+				formbouncer.addRule('does_not_exist', 'noop');
+			}
+			expect(fn).to.throw(Error, /TargetNotFound/);
+		});
+
+		it("should fail on not existing selector-target", function() {
+			var fn = function() {
+				formbouncer.addRule('#does_not_exist', 'noop');
+			}
+			expect(fn).to.throw(Error, /TargetNotFound/);
+		});
+
+		it("should fail on unknown validator", function() {
+			var fn = function() {
+				formbouncer.addRule(formElm, 'does_not_exist');
+			}
+			expect(fn).to.throw(Error, /ValidatorNotFound/);
+		});
+
+		it("should fail when invalid validator was requested", function() {
+			var fn = function() {
+				formbouncer.addRule(formElm, {});
+			}
+			expect(fn).to.throw(Error, /InvalidValidator/);
+		});
+
+	});
 
 	describe("construct", function() {
+
 		it("factory method is accessible through static method", function() {
 			expect(FormBouncer).itself.to.respondTo('create');
 		});
+
 		it("from form-element", function() {
-			var validator = FormBouncer.create(document.createElement('form'), {});
+			var formbouncer = FormBouncer.create(document.createElement('form'), {});
 		});
+
 		it("from element-id", function() {
 			var formElm = $('<form id="fb_from_id"><input type="text"><button>OK</button></form>');
 			$(document.body).append(formElm);
-			var validator = FormBouncer.create('fb_from_id', {});
+			FormBouncer.create('#fb_from_id', {});
 		});
+
 		it("from element-id at input-field throws error", function() {
 			var formElm = $('<form><input type="text" id="input_selector"><button>OK</button></form>');
 			$(document.body).append(formElm);
 			var fn = function() {
-				var validator = FormBouncer.create('input_selector', {});
+				FormBouncer.create('#input_selector', {});
 			}
 			expect(fn).to.throw(Error, /InvalidForm/);
 		});
+
 		it("from jQuery", function() {
 			var fn = function() {
 				FormBouncer.create($('<form></form>'), {});
 			}
 			expect(fn).not.to.throw(new Error('InvalidForm'));
 		});
+
 		it("from jQuery with multiple form-elements", function() {
 			var fn = function() {
 				FormBouncer.create($('<form></form><form></form>'), {});
 			}
 			expect(fn).not.to.throw(new Error('InvalidForm'));
 		});
+
 		it("from regex throws error", function() {
 			var fn = function() {
 				FormBouncer.create(/^$/, {})
 			}
 			expect(fn).to.throw(Error, /InvalidForm/);
 		});
+
 	});
 
 	describe("Default validators", function() {
+
 		describe("isNotEmpty validator", function() {
+
 			it("should be pre-registered", function() {
 				expect(FormBouncer.validators).to.have.property('isNotEmpty');
 			});
+
 			it("should catch empty input fields", function(done) {
 				var inputElement = $('<input type="text" value="">');
 				var isNotEmpty = FormBouncer.validators.isNotEmpty;
@@ -60,6 +103,7 @@ describe("FormBouncer", function() {
 					done();
 				}));
 			});
+
 			it("should pass on valid data", function(done) {
 				var inputElement = $('<input type="text" value="123">');
 				var isNotEmpty = FormBouncer.validators.isNotEmpty;
@@ -69,11 +113,15 @@ describe("FormBouncer", function() {
 					done();
 				}));
 			});
+
 		});
+
 		describe("isEmail validator", function() {
+
 			it("should be pre-registered", function() {
 				expect(FormBouncer.validators).to.have.property('isEmail');
 			});
+
 			it("should catch empty email", function(done) {
 				var inputElement = $('<input type="text" name="email">');
 				var isEmail = FormBouncer.validators.isEmail;
@@ -86,14 +134,18 @@ describe("FormBouncer", function() {
 					done();
 				}));
 			});
+
 		});
+
 	});
 
 	describe("Custom validators", function() {
-		it("is accessible through static method", function() {
+
+		it("are registerable through static method", function() {
 			expect(FormBouncer).itself.to.respondTo('registerValidator');
 		});
-		it("should be registratable", function() {
+
+		it("should be registerable", function() {
 			var validator = function(errors, proceed) {
 				proceed();
 			}
@@ -101,9 +153,11 @@ describe("FormBouncer", function() {
 			expect(FormBouncer.validators).to.have.property('customValidator');
 			expect(FormBouncer.validators.customValidator).to.be.a('function').and.be.equal(validator);
 		});
+
 	});
 
 	describe("validation in accordance to stopOnError", function() {
+
 		var formElm = $('<form><input type="text" name="firstname"><input type="text" name="lastname"><button>OK</button></form>').get(0);
 
 		it("should run all validators", function(done) {
@@ -130,9 +184,11 @@ describe("FormBouncer", function() {
 			fb.addRule('lastname', 'isNotEmpty');
 			fb.validate();
 		});
+
 	});
 
 	describe("validation flow", function() {
+
 		it("cleanup should be called before validation run", function(done) {
 			var calledCleanup = false;
 			var fb = FormBouncer.create(document.createElement('form'), {
@@ -174,9 +230,11 @@ describe("FormBouncer", function() {
 			fb.addRule('lastname', 'isNotEmpty');
 			fb.validate();
 		});
+
 	});
 
 	describe("ValidationError", function() {
+
 		it("factory is accessible through static method", function() {
 			expect(FormBouncer).itself.to.respondTo('error');
 		});
@@ -188,9 +246,11 @@ describe("FormBouncer", function() {
 			expect(err).to.have.property('message', errMsg);
 			expect(err).to.have.property('target', errElm);
 		});
+
 	});
 
 	describe("Pattern-validator factory", function() {
+
 		it("is accessible through static method", function() {
 			expect(FormBouncer).itself.to.respondTo('patternValidator');
 		});
@@ -206,5 +266,7 @@ describe("FormBouncer", function() {
 			}
 			expect(fn).to.throw(Error, /InvalidPattern/);
 		});
+
 	});
+
 });
