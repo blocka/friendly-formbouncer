@@ -181,6 +181,10 @@
 			options = options || {};
 
 			var $targets   = resolveTarget(target);
+			$targets.each(function() {
+				$(this).data('originalValue',$(this).val());
+			});
+
 			var validators = resolveValidator(validator);
 
 			var isInstant     = o.instantAll || ('instant' in options && true === options['instant']);
