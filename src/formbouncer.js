@@ -65,7 +65,7 @@
 
 				if (i < l) {
 					var rule = queue[i++];
-					rule.validator.call(rule.target, errors, next); // Call validator
+					rule.validator.call(rule.target, errors, next, rule.options); // Call validator
 				} else {
 					o.callback(errors);
 				}
